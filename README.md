@@ -1,0 +1,2 @@
+# bitcoincash-realtime-chart
+ビットコインキャッシュの過去24時間の価格をリアルタイムで取得する
