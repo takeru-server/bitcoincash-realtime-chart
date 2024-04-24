@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bitcoin Cash Price Chart (Real-time Update)</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+</head>
+<body>
+	<div>
+		<h1>Bitcoin Cash Price Chart (Real-time Update)</h1>
+		<canvas id="chart"></canvas>
+	</div>
+	
+	<!-- CSS -->
+	<style type="text/css">
+		body{
+			margin: 0 auto;
+			padding: 0;
+		}
+		
+		div {
+			min-height: 100vh; /* 全画面表示 */
+			max-height: 100vh; /* 全画面表示 */
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-position: center center;
+		}
+	</style>
+
+	
+	<!-- jQuery -->
+	<script>
+		// CoinGecko APIからビットコインキャッシュの価格データを取得する関数
+		function getBitcoinCashPriceData() {
+			return $.getJSON('https://api.coingecko.com/api/v3/coins/bitcoin-cash/market_chart?vs_currency=jpy&days=1');
+		}
+
+		// チャートを更新する関数
+		function updateChart(chart) {
+			getBitcoinCashPriceData().done(function(data) {
+				var times = data.prices.map(item => new Date(item[0]).toLocaleTimeString());
+				var prices = data.prices.map(item => item[1]);
+
+				// チャートデータを更新
+				chart.data.labels = times;
+				chart.data.datasets[0].data = prices;
+
+				// 古いデータを削除
+				chart.data.labels.shift();
+				chart.data.datasets[0].data.shift();
+
+				// チャートを更新
+				chart.update();
+			});
+		}
+
+		// 初期チャートを描画
+		var ctx = document.getElementById('chart').getContext('2d');
+		var chart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: [],
+				datasets: [{
+					label: 'Bitcoin Cash Price (JPY)',
+					data: [],
+					borderColor: 'rgb(75, 192, 192)',
+					tension: 0.1
+				}]
+			},
+			options: {
+				scales: {
+					y: {
+						beginAtZero: false
+					}
+				}
+			}
+		});
+
+		// 1秒ごとにチャートを更新
+		setInterval(function() { updateChart(chart); }, 1000);
+	</script>
+</body>
+</html>
